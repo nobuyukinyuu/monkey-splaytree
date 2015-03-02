@@ -125,19 +125,23 @@ Class SplayTree<K, V>
 	'	**************************************************************************
  
 	' height of tree (1-node tree has height 0)
-	Method Height:Int()
+	Method Height:Int() Property
 		Return Height(root)
 	End
 	
-	Method Size:Int()
+	Method Size:Int() Property
 		Return Size(root)
 	End 
 
-'	Method ObjectEnumerator:NodeEnumerator<K, V>()
-'		Return New NodeEnumerator<K, V>(root)
-'	End
-		
-		
+	Method ObjectEnumerator:NodeEnumerator<K, V>()
+		Return New NodeEnumerator<K, V>(root)
+	End
+	Method Keys:SplayKeys<K, V>()
+		Return New SplayKeys<K, V>(root)
+	End		
+	Method Values:SplayValues<K, V>()
+		Return New SplayValues<K, V>(root)
+	End				
 	Private
  	
 	Method Height(x:Node<K, V>)
@@ -298,14 +302,21 @@ Class SplayTree<K, V>
 End
  
  
-'Private
- 
+
 Class Node<K, V> 
 	Method New(key:K, value:V)
 		Self.key   = key
 		Self.value = value
 	End
 
+	Method Key:K() Property
+		Return key
+	End
+	
+	Method Value:V() Property
+		Return value
+	End	
+	
   Private
 	Field key:K				   ' key
 	Field value:V				 ' associated data
@@ -313,6 +324,143 @@ Class Node<K, V>
 	Field parent:Node		
 End
  
+
+Class NodeEnumerator<K, V>
+
+	Method New( node:Node<K,V> )
+		Self.node = node
+		s.Push(node)
+		
+	End
+	
+	Method HasNext:Bool()
+		Return Not (s.IsEmpty() And node = Null)
+	End
+	
+	Method NextObject:Node<K, V>()
+		Local t:= node  'Set to current to return later.  Set node to the next node in the tree.
+		
+		'Start to traverse the tree.  Set the node to the next position.
+		Repeat
+			If node <> Null 'the last operation didn't produce a null node.  Push stack and go left.
+				s.Push(node)
+				node = node.left
+			ElseIf Not s.IsEmpty() 'The last operation produced a null node.  Pop stack from last valid node and go right.
+				node = s.Pop()
+				node = node.right
+			Else  'There's nothing more to pop from the stack, and the last operation produced a null node.  We're done.
+				Exit
+			End
+		Until node <> Null
+		
+		Return t		
+	End
+
+Private
+	Field node:Node<K, V>       'current node
+	Field s:= New Stack<Node<K, V>>   'traverser stack
+End
+
+Class KeyEnumerator<K, V>
+
+	Method New( node:Node<K,V> )
+		Self.node = node
+		s.Push(node)
+		
+	End
+	
+	Method HasNext:Bool()
+		Return Not (s.IsEmpty() And node = Null)
+	End
+	
+	Method NextObject:K()
+		Local t:= node  'Set to current to return later.  Set node to the next node in the tree.
+		
+		'Start to traverse the tree.  Set the node to the next position.
+		Repeat
+			If node <> Null 'the last operation didn't produce a null node.  Push stack and go left.
+				s.Push(node)
+				node = node.left
+			ElseIf Not s.IsEmpty() 'The last operation produced a null node.  Pop stack from last valid node and go right.
+				node = s.Pop()
+				node = node.right
+			Else  'There's nothing more to pop from the stack, and the last operation produced a null node.  We're done.
+				Exit
+			End
+		Until node <> Null
+		
+		Return t.key
+	End
+
+Private
+	Field node:Node<K, V>       'current node
+	Field s:= New Stack<Node<K, V>>   'traverser stack
+End
+
+Class ValueEnumerator<K, V>
+
+	Method New( node:Node<K,V> )
+		Self.node = node
+		s.Push(node)
+		
+	End
+	
+	Method HasNext:Bool()
+		Return Not (s.IsEmpty() And node = Null)
+	End
+	
+	Method NextObject:V()
+		Local t:= node  'Set to current to return later.  Set node to the next node in the tree.
+		
+		'Start to traverse the tree.  Set the node to the next position.
+		Repeat
+			If node <> Null 'the last operation didn't produce a null node.  Push stack and go left.
+				s.Push(node)
+				node = node.left
+			ElseIf Not s.IsEmpty() 'The last operation produced a null node.  Pop stack from last valid node and go right.
+				node = s.Pop()
+				node = node.right
+			Else  'There's nothing more to pop from the stack, and the last operation produced a null node.  We're done.
+				Exit
+			End
+		Until node <> Null
+		
+		Return t.value
+	End
+
+Private
+	Field node:Node<K, V>       'current node
+	Field s:= New Stack<Node<K, V>>   'traverser stack
+End
+
+
+Class SplayKeys<K, V>
+
+	Method New(treeRoot:Node<K, V>)
+		Self.root = treeRoot
+	End
+
+	Method ObjectEnumerator:KeyEnumerator<K,V>()
+		Return New KeyEnumerator<K, V>(root)
+	End
+	
+Private
+	Field root:Node<K, V>
+End
+
+Class SplayValues<K, V>
+
+	Method New(treeRoot:Node<K, V>)
+		Self.root = treeRoot
+	End
+
+	Method ObjectEnumerator:ValueEnumerator<K, V>()
+		Return New ValueEnumerator<K, V>(root)
+	End
+	
+Private
+	Field root:Node<K, V>
+End
  
 'Helper versions...
  
