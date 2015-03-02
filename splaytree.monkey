@@ -17,11 +17,10 @@ Class SplayTree<K, V>
 	End
  
 	Method Contains:Bool(key:K)
-		Return (Get(key) <> null)
+		Return (Find(key) <> Null)
 	End
  		
-	' return value associated with the given key
-	' If no such value, return null
+	'Summary: Returns a value associated with the given key. Returns Null if no pair exists for the given key.
 	Method Get:V(key:K)
 		Local node:Node<K, V> = Find(key)
 		
@@ -37,6 +36,7 @@ Class SplayTree<K, V>
 		End	
 	End
  
+	'Summary:  Adds a keypair to the tree.  Set splay to True to fetch your key quicker on first access, or False to insert quicker.
 	Method Set:Bool(key:K, value:V, splay:Bool = True)
 		Local insertNode:Node<K, V> = New Node<K, V>(key, value)
 		
@@ -86,12 +86,34 @@ Class SplayTree<K, V>
 
 		Return True
 	End
-
-	Method Remove( key:K )
+	
+	'Summary:  Adds a new keypair to the tree.  Returns False if the key already exists.
+	Method Add:Bool(key:K, value:V, splay:Bool = True)
+		Local z:Node<K, V> = Find(key)
+		If z = Null Then
+			Set(key, value, splay)
+			Return True
+		Else
+			Return False
+		End If
+	End
+	'Summary:  Updates an existing keypair in the tree.  Returns False if the key doesn't exist.
+	Method Update:Bool(key:K, value:V, splay:Bool = True)
+		Local z:Node<K, V> = Find(key)
+		If z <> Null Then
+			Set(key, value, splay)
+			Return True
+		Else
+			Return False
+		End If
+	End
+	
+	
+	Method Remove:Bool(key:K)
 		Local z:Node<K,V> = Find( key )
 	
 		If( z = Null ) 
-			Return
+			Return False
 		End
  
 		Splay( z )
@@ -118,6 +140,8 @@ Class SplayTree<K, V>
 		#IF THRESHOLD
 			splayThreshold = Min(3, Int(Log(elementCount) * 1.442695 * 0.25))
 		#ENDIF
+		
+		Return True
 	End
 		
 	'   **************************************************************************

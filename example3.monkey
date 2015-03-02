@@ -22,11 +22,6 @@ Class Game Extends App
 		time = Millisecs() - time
 		Print("Splay insert time: " + time)
 
-
-		Local i:Int
-		For Local k:= EachIn a
-			i += 1
-		Next
 	End Method
 	
 	Method OnUpdate:Int()
